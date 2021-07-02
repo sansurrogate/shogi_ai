@@ -127,3 +127,23 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+!/lib
+
+/data/*
+!/data/raw
+!/data/clean
+!/data/kifu_csa
+!/data/dataset_information
+
+/data/raw/*
+!/data/raw/.gitkeep
+
+/data/clean/*
+!/data/clean/.gitkeep
+
+/data/kifu_csa/*
+!/data/kifu_csa/.gitkeep
+
+/data/dataset_information/*
+!/data/dataset_information/.gitkeep
