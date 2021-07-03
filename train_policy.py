@@ -21,8 +21,8 @@ class Config:
 
     gpus: int = 0
     num_workers_dataloader: int = 6
-    batch_size_train: int = 32
-    batch_size_valid: int = 16
+    batch_size_train: int = 128
+    batch_size_valid: int = 512
     epoch: int = 10
     lr: float = 1e-3
     log_interval: int = 100
@@ -61,12 +61,12 @@ def train(
 
     trainer = pl.Trainer(
         gpus=gpus,
-        val_check_interval=0.01,
+        val_check_interval=0.1,
         callbacks=[
             EarlyStopping(monitor="valid_loss"),
             ModelCheckpoint(monitor="valid_loss"),
         ],
-        limit_val_batches=8,
+        limit_val_batches=5,
         num_sanity_val_steps=1,
         max_epochs=epoch,
     )

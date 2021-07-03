@@ -57,6 +57,7 @@ def main(args):
     filepath_valid = os.path.join(
         dirname, f"kifulist_valid{args.suffix}.pickle"
     )
+    logging.info(f"size: train={len(df_train)}, valid={len(df_valid)}")
     logging.info(f"save train to {filepath_train}, valid to {filepath_valid}.")
     with open(filepath_train, "wb") as f:
         pickle.dump(list(df_train["filename"]), f)
