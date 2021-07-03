@@ -19,8 +19,9 @@ class Config:
     kifulist_valid: str = "./data/dataset_information/kifulist_valid.pickle"
     checkpoint: Optional[str] = None
 
+    gpus: int = 0
     num_workers_dataloader: int = 6
-    batch_size_train: int = 128
+    batch_size_train: int = 32
     batch_size_valid: int = 16
     epoch: int = 10
     lr: float = 1e-3
@@ -36,6 +37,7 @@ def train(
     batch_size_train,
     path_kifulist_valid,
     batch_size_valid,
+    gpus,
     num_workers_dataloader,
     epoch,
     lr,
@@ -58,7 +60,7 @@ def train(
         model = PolicyNet.load_from_checkpoint(checkpoint)
 
     trainer = pl.Trainer(
-        gpus=1,
+        gpus=gpus,
         val_check_interval=0.01,
         callbacks=[
             EarlyStopping(monitor="valid_loss"),
@@ -83,10 +85,11 @@ def main(cfg: Config) -> None:
         cfg.batch_size_train,
         to_absolute_path(cfg.kifulist_valid),
         cfg.batch_size_valid,
+        cfg.gpus,
         cfg.num_workers_dataloader,
         cfg.epoch,
         cfg.lr,
-        cfg.checkpoint,
+        to_absolute_path(cfg.checkpoint) if cfg.checkpoint else None,
     )
 
 
