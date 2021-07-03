@@ -5,7 +5,7 @@ description = ""
 authors = ["sansurrogate <takaaki.sanjoh@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.7.10"
 torch = "^1.9.0"
 torchvision = "^0.10.0"
 torchaudio = "^0.9.0"
@@ -17,8 +17,8 @@ pytorch-lightning = "^1.3.8"
 mypy = "^0.910"
 flake8 = "^3.9.2"
 jupyterlab = "^3.0.16"
-pandas = "^1.2.5"
-black = {version = "^21.6b0", allow-prereleases = true}
+pandas = "1.2.5"
+black = "^21.6b0"
 matplotlib = "^3.4.2"
 tqdm = "^4.61.1"
 
