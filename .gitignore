@@ -147,3 +147,5 @@ dmypy.json
 
 /data/dataset_information/*
 !/data/dataset_information/.gitkeep
+
+/outputs
