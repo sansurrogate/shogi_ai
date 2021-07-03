@@ -12,6 +12,8 @@ logging.basicConfig(level=logging.DEBUG)
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset_information", type=str)
+    parser.add_argument("--limit", type=int, required=False)
+    parser.add_argument("--suffix", type=str, default="")
     parser.add_argument("--train_ratio", type=float, default=0.8)
     parser.add_argument("--valid_ratio", type=float, default=0.2)
     args = parser.parse_args()
@@ -44,10 +46,17 @@ def main(args):
     logging.info(f"cleanse and split {filepath}.")
     dirname = os.path.dirname(filepath)
     df = clense(filepath)
+    if args.limit:
+        logging.info(f"limit record num to {args.limit}.")
+        df = df.sample(n=args.limit)
     df_train, df_valid = split(df, args.train_ratio, args.valid_ratio)
 
-    filepath_train = os.path.join(dirname, "kifulist_train.pickle")
-    filepath_valid = os.path.join(dirname, "kifulist_valid.pickle")
+    filepath_train = os.path.join(
+        dirname, f"kifulist_train{args.suffix}.pickle"
+    )
+    filepath_valid = os.path.join(
+        dirname, f"kifulist_valid{args.suffix}.pickle"
+    )
     logging.info(f"save train to {filepath_train}, valid to {filepath_valid}.")
     with open(filepath_train, "wb") as f:
         pickle.dump(list(df_train["filename"]), f)
