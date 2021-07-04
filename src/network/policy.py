@@ -12,6 +12,8 @@ class PolicyNet(pl.LightningModule):
         middle_ch=192,
         out_ch=common.MOVE_DIRECTION_LABEL_NUM,
         ksize=3,
+        hidden_layer_num=11,
+        batch_norm=True,
         lr=1e-3,
     ):
         super().__init__()
@@ -19,37 +21,57 @@ class PolicyNet(pl.LightningModule):
         self.middle_ch = middle_ch
         self.out_ch = out_ch
         self.ksize = ksize
+        self.hidden_layer_num = hidden_layer_num
         self.lr = lr
-        self.conv01 = nn.Conv2d(in_ch, middle_ch, ksize, padding="same")
-        self.conv02 = nn.Conv2d(middle_ch, middle_ch, ksize, padding="same")
-        self.conv03 = nn.Conv2d(middle_ch, middle_ch, ksize, padding="same")
-        self.conv04 = nn.Conv2d(middle_ch, middle_ch, ksize, padding="same")
-        self.conv05 = nn.Conv2d(middle_ch, middle_ch, ksize, padding="same")
-        self.conv06 = nn.Conv2d(middle_ch, middle_ch, ksize, padding="same")
-        self.conv07 = nn.Conv2d(middle_ch, middle_ch, ksize, padding="same")
-        self.conv08 = nn.Conv2d(middle_ch, middle_ch, ksize, padding="same")
-        self.conv09 = nn.Conv2d(middle_ch, middle_ch, ksize, padding="same")
-        self.conv10 = nn.Conv2d(middle_ch, middle_ch, ksize, padding="same")
-        self.conv11 = nn.Conv2d(middle_ch, middle_ch, ksize, padding="same")
-        self.conv12 = nn.Conv2d(middle_ch, middle_ch, ksize, padding="same")
-        self.conv13 = nn.Conv2d(middle_ch, out_ch, 1)
+
+        if batch_norm:
+            self.input_layer = nn.Sequential(
+                nn.Conv2d(in_ch, middle_ch, ksize, padding="same"),
+                nn.BatchNorm2d(middle_ch),
+                nn.ReLU(),
+            )
+            self.hidden_layer = nn.Sequential(
+                *sum(  # flatten 2d list
+                    [
+                        [
+                            nn.Conv2d(
+                                middle_ch, middle_ch, ksize, padding="same"
+                            ),
+                            nn.BatchNorm2d(middle_ch),
+                            nn.ReLU(),
+                        ]
+                        for _ in range(hidden_layer_num)
+                    ],
+                    [],
+                )
+            )
+        else:
+            self.input_layer = nn.Sequential(
+                nn.Conv2d(in_ch, middle_ch, ksize, padding="same"), nn.ReLU()
+            )
+            self.hidden_layer = nn.Sequential(
+                *sum(  # flatten 2d list
+                    [
+                        [
+                            nn.Conv2d(
+                                middle_ch, middle_ch, ksize, padding="same"
+                            ),
+                            nn.ReLU(),
+                        ]
+                        for _ in range(hidden_layer_num)
+                    ],
+                    [],
+                )
+            )
+
+        self.conv_output = nn.Conv2d(middle_ch, out_ch, 1)
 
     def forward(self, x):
         x = x.float()
-        h01 = F.relu(self.conv01(x))
-        h02 = F.relu(self.conv02(h01))
-        h03 = F.relu(self.conv03(h02))
-        h04 = F.relu(self.conv04(h03))
-        h05 = F.relu(self.conv05(h04))
-        h06 = F.relu(self.conv06(h05))
-        h07 = F.relu(self.conv07(h06))
-        h08 = F.relu(self.conv08(h07))
-        h09 = F.relu(self.conv09(h08))
-        h10 = F.relu(self.conv10(h09))
-        h11 = F.relu(self.conv11(h10))
-        h12 = F.relu(self.conv12(h11))
-        h13 = self.conv13(h12)
-        return h13.reshape(*x.shape[:-3], -1)
+        h1 = self.input_layer(x)
+        h2 = self.hidden_layer(h1)
+        output = self.conv_output(h2)
+        return output.reshape(*x.shape[:-3], -1)
 
     def validation_step(self, batch, batch_idx):
         x, y, _ = batch

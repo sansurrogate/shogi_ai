@@ -27,6 +27,11 @@ class Config:
     lr: float = 1e-3
     log_interval: int = 100
 
+    middle_ch: int = 192
+    ksize: int = 3
+    hidden_layer_num: int = 11
+    batch_norm: bool = True
+
 
 cs = ConfigStore.instance()
 cs.store(name="config", node=Config)
@@ -42,6 +47,10 @@ def train(
     epoch,
     lr,
     checkpoint,
+    middle_ch,
+    ksize,
+    hidden_layer_num,
+    batch_norm,
 ):
     dataset_train = KifuDataset(path_kifulist_train)
     loader_train = DataLoader(
@@ -55,7 +64,13 @@ def train(
     )
 
     if checkpoint is None:
-        model = PolicyNet(lr=lr)
+        model = PolicyNet(
+            middle_ch=middle_ch,
+            ksize=ksize,
+            hidden_layer_num=hidden_layer_num,
+            batch_norm=batch_norm,
+            lr=lr,
+        )
     else:
         model = PolicyNet.load_from_checkpoint(checkpoint)
 
@@ -90,6 +105,10 @@ def main(cfg: Config) -> None:
         cfg.epoch,
         cfg.lr,
         to_absolute_path(cfg.checkpoint) if cfg.checkpoint else None,
+        cfg.middle_ch,
+        cfg.ksize,
+        cfg.hidden_layer_num,
+        cfg.batch_norm,
     )
 
 
