@@ -10,7 +10,7 @@ from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 from torch.utils.data import DataLoader
 
 from lib.kifu_dataset import KifuDataset
-from lib.network.policy import PolicyNet
+from network.policy import PolicyNet
 
 
 @dataclass

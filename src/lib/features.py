@@ -14,6 +14,7 @@ from .common import (
     UP2_RIGHT,
     UP_LEFT,
     UP_RIGHT,
+    bb_rotate_180,
 )
 
 
@@ -86,3 +87,25 @@ def make_output_label(move, color):
     move_label = 9 * 9 * move_direction + move_to
 
     return move_label
+
+
+def make_input_features_from_board(board):
+    if board.turn == shogi.BLACK:
+        piece_bb = board.piece_bb
+        occupied = (board.occupied[shogi.BLACK], board.occupied[shogi.WHITE])
+        pieces_in_hand = (
+            board.pieces_in_hand[shogi.BLACK],
+            board.pieces_in_hand[shogi.WHITE],
+        )
+    else:
+        piece_bb = [bb_rotate_180(bb) for bb in board.piece_bb]
+        occupied = (
+            bb_rotate_180(board.occupied[shogi.WHITE]),
+            bb_rotate_180(board.occupied[shogi.BLACK]),
+        )
+        pieces_in_hand = (
+            board.pieces_in_hand[shogi.WHITE],
+            board.pieces_in_hand[shogi.BLACK],
+        )
+
+    return make_input_features(piece_bb, occupied, pieces_in_hand)
