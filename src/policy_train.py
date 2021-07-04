@@ -78,7 +78,7 @@ def train(
         gpus=gpus,
         val_check_interval=0.1,
         callbacks=[
-            EarlyStopping(monitor="valid_loss"),
+            EarlyStopping(monitor="valid_loss", patience=20),
             ModelCheckpoint(monitor="valid_loss"),
         ],
         limit_val_batches=5,
