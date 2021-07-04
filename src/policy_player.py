@@ -11,6 +11,7 @@ from hydra.utils import to_absolute_path
 from omegaconf import MISSING
 from torch.distributions.categorical import Categorical
 
+from lib.configure_logging import init_logger
 from lib.features import make_input_features_from_board, make_output_label
 from lib.play import Play, Player
 from network.policy import PolicyNet
@@ -121,11 +122,9 @@ cs.store(name="config", node=Config)
 
 @hydra.main(config_path=None, config_name="config")
 def main(cfg: Config) -> None:
-    logging.basicConfig(
-        format="%(asctime)s\t%(levelname)s\t%(message)s",
-        datefmt="%Y%m%d %H:%M:%S",
-        level=logging.DEBUG,
-    )
+    init_logger(logging.DEBUG)
+
+    logging.info("start main")
     player = PolicyPlayer(
         modelfile=to_absolute_path(cfg.modelfile),
         chose_action=cfg.chose_action,
